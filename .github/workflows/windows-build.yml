@@ -1,0 +1,34 @@
+ame: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyInstaller
+        run: python -m pip install --upgrade pip pyinstaller
+
+      - name: Build EXE
+        run: pyinstaller --clean --onefile --windowed --name KistiHisabProfessional main.py
+
+      - name: Package
+        shell: powershell
+        run: Compress-Archive -Path dist/KistiHisabProfessional.exe -DestinationPath KistiHisabProfessional-Windows.zip
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KistiHisabProfessional-Windows
+          path: KistiHisabProfessional-Windows.zip
